@@ -47,12 +47,11 @@ module.exports.getToken = function(callback) {
 
 
 
-module.exports.getTweets = function(bearerToken, callback) {
+module.exports.getTweets = function(bearerToken, screen_name, callback) {
     // this function will use the token to get tweets from twitter.
     // you will write this yourself
 
-    const screen_name = "theonion";
-    const qs = `?screen_name=${screen_name}&tweet_mode=extended&count=20`;
+    const qs = `?screen_name=${screen_name}&tweet_mode=extended`;
 
     const options = {
         host: "api.twitter.com",
@@ -98,8 +97,9 @@ module.exports.filterTweets = function(tweets) {
         let t = tweets[i];
         let headline;
         let url;
+        // console.log(t);
 
-        if (t.full_text && t.entities.urls.length == 1) {
+        if (t.entities.urls.length == 1) {
             headline = t.full_text.replace(t.entities.urls[0].url, "");
             url = t.entities.urls[0].url;
 
@@ -108,7 +108,11 @@ module.exports.filterTweets = function(tweets) {
                     headline = headline.replace(t.entities.media[j].url, "");
                 }
             }
-            filteredTweets.push({"url": url, "headline": headline});
+            if (headline.length > 0) {
+                let screen_name = t.user.name;
+                headline = headline + ` (${screen_name})`;
+                filteredTweets.push({"url": url, "headline": headline});
+            }
         }
     }
 
